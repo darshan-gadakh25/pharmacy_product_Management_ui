@@ -1,12 +1,11 @@
-import "./App.css";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import About from './pages/About';
+import ContactUs from './pages/ContactUs';
 
 function App() {
   return (
-    <>
-      <h4>Hello world </h4>
-      <h4> vaishnavi </h4>
-      <h4>Amey: Hello</h4>
-    </>
+    <></>
   );
 }
 
