@@ -4,6 +4,8 @@ import Layout from "./components/layout/Layout";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import ContactUs from "./pages/ContactUs";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 function App() {
   return (
@@ -17,8 +19,8 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About/>} />
                 <Route path="/contact" element={<ContactUs/>}/>
-                <Route path="/login" />
-                <Route path="/signup" />
+                <Route path="/login" element={<Login/>}/>
+                <Route path="/signup" element={<Register/>} />
               </Routes>
             </Layout>
           }
