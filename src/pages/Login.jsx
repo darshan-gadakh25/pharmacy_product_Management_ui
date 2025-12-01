@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from 'react-hot-toast';
-import { apiService } from "../services/api";
+import { useAuth } from '../contexts/AuthContext';
 
 const Login = () => {
   const [form, setForm] = useState({
@@ -11,6 +11,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -23,19 +24,18 @@ const Login = () => {
     setError("");
 
     try {
-      const response = await apiService.auth.login(form);
+      const response = await login(form);
       toast.success('Login successful!');
 
-      console.log(response)
-      const userRole=response.userRole;
-      if(userRole==='ADMIN'){
-        navigate('/admindashboard');
+      // Navigate based on user role
+      const userRole = response.role;
+      if (userRole === 'ADMIN') {
+        navigate('/admin-dashboard');
+      } else if (userRole === 'SUPPLIER') {
+        navigate('/supplier-dashboard');
+      } else {
+        navigate('/customer-dashboard');
       }
-      else if(userRole==='SUPPLIER'){
-
-        navigate('/supplierdashboard');
-      }
-      navigate('/customerdashboard');
     } catch (err) {
       const errorMsg = err.response?.data?.message || 'Login failed. Please try again.';
       setError(errorMsg);
@@ -46,10 +46,10 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center items-center">
-      <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
+    <div className="min-h-screen bg-blue-50 flex justify-center items-center">
+      <div className="bg-white p-8 rounded-2xl shadow-xl border border-blue-100 w-full max-w-md">
         <h2 className="text-3xl font-bold text-center mb-6 text-blue-600">
-          Pharmacy Login
+          PharmaCare Login
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
