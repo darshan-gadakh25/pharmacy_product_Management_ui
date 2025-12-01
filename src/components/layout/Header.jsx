@@ -1,8 +1,28 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from '../../contexts/AuthContext';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, isAuthenticated, logout, loading } = useAuth();
+  const navigate = useNavigate();
+
+
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+  const getDashboardLink = () => {
+    if (!isAuthenticated || !user) return '/login';
+    switch (user.role) {
+      case 'ADMIN': return '/admin-dashboard';
+      case 'SUPPLIER': return '/supplier-dashboard';
+      case 'CUSTOMER': return '/customer-dashboard';
+      default: return '/login';
+    }
+  };
 
   return (
     <header className="bg-gradient-to-r from-green-600 to-blue-500 text-white shadow-2xl backdrop-blur-sm">
@@ -23,9 +43,15 @@ const Header = () => {
           <nav className="hidden md:flex space-x-8 items-center">
             <Link
               to="/"
-              className="hover:text-blue-600 transition-all duration-600 font-medium hover:scale-200"
+              className="hover:text-blue-200 transition-all duration-300 font-medium hover:scale-105"
             >
               Home
+            </Link>
+            <Link
+              to="/products"
+              className="hover:text-blue-200 transition-all duration-300 font-medium hover:scale-105"
+            >
+              Products
             </Link>
             <Link
               to="/about"
@@ -37,20 +63,51 @@ const Header = () => {
               to="/contact"
               className="hover:text-blue-200 transition-all duration-300 font-medium hover:scale-105"
             >
-              Contact Us
+              Contact
             </Link>
-            <Link
-              to="/login"
-              className="hover:text-blue-200 transition-all duration-300 font-medium hover:scale-105"
-            >
-              Login
-            </Link>
-            <Link
-              to="/signup"
-              className="hover:text-blue-200 transition-all duration-300 font-medium hover:scale-105"
-            >
-              Sign Up
-            </Link>
+            
+            {isAuthenticated ? (
+              <>
+                <Link
+                  to={getDashboardLink()}
+                  className="hover:text-blue-200 transition-all duration-300 font-medium hover:scale-105"
+                >
+                  Dashboard
+                </Link>
+                {user.role === 'CUSTOMER' && (
+                  <Link
+                    to="/cart"
+                    className="hover:text-blue-200 transition-all duration-300 font-medium hover:scale-105"
+                  >
+                    Cart
+                  </Link>
+                )}
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm">Hi, {user?.fullName?.split(" ")[0]}</span>
+                  <button
+                    onClick={handleLogout}
+                    className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="hover:text-blue-200 transition-all duration-300 font-medium hover:scale-105"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/signup"
+                  className="bg-white text-blue-600 px-4 py-2 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-300"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
           </nav>
 
           {/* Mobile Menu Button */}
@@ -85,33 +142,81 @@ const Header = () => {
               <Link
                 to="/"
                 className="py-2 px-4 hover:bg-blue-600 rounded-lg transition-all duration-300 font-medium"
+                onClick={() => setIsMenuOpen(false)}
               >
                 Home
               </Link>
               <Link
+                to="/products"
+                className="py-2 px-4 hover:bg-blue-600 rounded-lg transition-all duration-300 font-medium"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Products
+              </Link>
+              <Link
                 to="/about"
                 className="py-2 px-4 hover:bg-blue-600 rounded-lg transition-all duration-300 font-medium"
+                onClick={() => setIsMenuOpen(false)}
               >
                 About
               </Link>
               <Link
                 to="/contact"
                 className="py-2 px-4 hover:bg-blue-600 rounded-lg transition-all duration-300 font-medium"
+                onClick={() => setIsMenuOpen(false)}
               >
-                Contact Us
+                Contact
               </Link>
-              <Link
-                to="/login"
-                className="py-2 px-4 hover:bg-blue-600 rounded-lg transition-all duration-300 font-medium"
-              >
-                Login
-              </Link>
-              <Link
-                to="/signup"
-                className="py-2 px-4 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-300 text-center"
-              >
-                Sign Up
-              </Link>
+              
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    to={getDashboardLink()}
+                    className="py-2 px-4 hover:bg-blue-600 rounded-lg transition-all duration-300 font-medium"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+                  {user.role === 'CUSTOMER' && (
+                    <Link
+                      to="/cart"
+                      className="py-2 px-4 hover:bg-blue-600 rounded-lg transition-all duration-300 font-medium"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Cart
+                    </Link>
+                  )}
+                  <div className="py-2 px-4 text-sm">
+                    Hi, {user?.fullName}
+                  </div>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setIsMenuOpen(false);
+                    }}
+                    className="py-2 px-4 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-all duration-300 text-center"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="py-2 px-4 hover:bg-blue-600 rounded-lg transition-all duration-300 font-medium"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/signup"
+                    className="py-2 px-4 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-300 text-center"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
             </div>
           </nav>
         )}
